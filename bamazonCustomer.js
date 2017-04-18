@@ -20,14 +20,16 @@ connection.connect(function(err) {
   console.log("connected as id " + connection.threadId);
 });
 // query for geting all the relevent information from database to display in command line
-connection.query("SELECT * FROM `products`", function(err, results) {
-	if (err) throw err;
-		for (var i = 0; i < results.length; i++) {
-			console.log("id: " + results[i].item_id, results[i].product_name, "$" + results[i].price)
-		};
-	buying();
+var start = function() {
+  connection.query("SELECT * FROM `products`", function(err, results) {
+	 if (err) throw err;
+		  for (var i = 0; i < results.length; i++) {
+			 console.log("id: " + results[i].item_id, results[i].product_name, "$" + results[i].price)
+		  };
+	 buying();
 
-});
+  });
+};
 
 //function that will use inquire and ask the user to purchase an item and hom many
 var buying = function() {
@@ -72,18 +74,20 @@ var buying = function() {
         ]
       , function(err, res) {
         if (err) throw err;
-        console.log("Thank you for your purchase :)")
-        buying();
+        console.log("Thank you for your purchase :)");
+        console.log("------------------------------------");
+        start();
         });
       }
       else {
         // not enough supply
         console.log("Not enough inventory. Try again...");
-      buying();
+        console.log("------------------------------------")
+      start();
       }
     });
   });
    
 };
 
-
+start()

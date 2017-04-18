@@ -51,6 +51,9 @@ var buying = function() {
       for (var i = 0; i < results.length; i++) {
         if (results[i].item_id.toString() === answer.item_id) {
           chosenItem = results[i];
+          console.log(chosenItem.stock)
+          console.log(chosenItem.stock - answer.total)
+          console.log(chosenItem.item_id)
         }
       }
 
@@ -58,9 +61,10 @@ var buying = function() {
       if (chosenItem.stock > parseInt(answer.total)) {
         // enough supply high enough, so update db, let the user know, and start over
         connection.query("UPDATE products SET ? WHERE ?", [{
+
           stock: chosenItem.stock - answer.total
         }, {
-          id: chosenItem.item_id
+          item_id: chosenItem.item_id
         }], function(err, res) {
           
           console.log("thank you for your purchase!");
@@ -74,7 +78,7 @@ var buying = function() {
       }
     });
   });
-   connection.end();
+connection.end();   
 };
 
 

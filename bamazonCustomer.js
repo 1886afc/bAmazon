@@ -19,61 +19,67 @@ connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
 });
-//var start = function() {
-	connection.query("SELECT * FROM products", function(err, results) {
-		if (err) throw err;
-			for (var i = 0; i < results.length; i++) {
-				console.log(results[i].item_id, results[i].product_name, results[i].price)
-			}
-			//console.log(results.product_name);
-	startFun()
-	});
-//};
+// query for geting all the relevent information from database to display in command line
+connection.query("SELECT * FROM `products`", function(err, results) {
+	if (err) throw err;
+		for (var i = 0; i < results.length; i++) {
+			console.log("id: " + results[i].item_id, results[i].product_name, "$" + results[i].price)
+		};
+	buying();
+});
 
-//function that starts the app
-var startFun = function() {
-	//prompt asking what they would like to buy
-	inquirer.prompt([
-		{
-			name: "id",
-			type: "input",
-			message: "enter the id of the item you would like to purchase"
-		},
-		{	name: "total",
-			type: "input",
-			message: "How many would you like to purchase?"
+//function that will use inquire and ask the user to purchase an item and hom many
+var buying = function() {
+  // query the database for all items being sold
+  connection.query("SELECT * FROM products", function(err, results) {
+    if (err) throw err;
+    // once you have the items, prompt the user for which they'd like to buy
+    inquirer.prompt([
+      {
+        name: "item_id",
+        type: "input",  
+        message: "enter item id of item you would like to purchase"
+      },
+      {
+        name: "total",
+        type: "input",
+        message: "How many would you like to buy?"
+      }
+    ]).then(function(answer) {
+      // get the information of the chosen item
+      var chosenItem;
+      for (var i = 0; i < results.length; i++) {
+        if (results[i].item_id.toString() === answer.item_id) {
+          chosenItem = results[i];
+          console.log(chosenItem.stock)
+          console.log(chosenItem.stock - answer.total)
+          console.log(chosenItem.item_id)
+        }
+      }
 
-		}
-	]).then(function(answer) {
-		connection.query("UPDATE products SET ? WHERE ?",
-		[
-    		{
-        		stock: -parseInt(answer.total)
-    		},
-    		{
-        		item_id: answer.id
-    		}
-		]
+      // determine if there is enough supply
+      if (chosenItem.stock > parseInt(answer.total)) {
+        // enough supply high enough, so update db, let the user know, and start over
+        connection.query("UPDATE products SET ? WHERE ?", [{
 
-    , function(err, results) {
-    	
-    	start1()
-		});
-	})
-	//connection.end()
+          stock: chosenItem.stock - answer.total
+        }, {
+          item_id: chosenItem.item_id
+        }], function(err, res) {
+          
+          console.log("thank you for your purchase!");
+          
+        });
+      }
+      else {
+        // not enough supply
+        console.log("Not enough inventory. Try again...");
+        
+      }
+    });
+  });
+connection.end();   
 };
 
 
-
-var start1 = function() {
-	connection.query("SELECT * FROM products", function(err, results) {
-		if (err) throw err;
-			for (var i = 0; i < results.length; i++) {
-				console.log(results[i].item_id, results[i].product_name, results[i].stock)
-			}
-			//console.log(results.product_name);
-	});
-	connection.end();
-};
-
-//start()
+s

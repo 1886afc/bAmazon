@@ -26,6 +26,7 @@ connection.query("SELECT * FROM `products`", function(err, results) {
 			console.log("id: " + results[i].item_id, results[i].product_name, "$" + results[i].price)
 		};
 	buying();
+
 });
 
 //function that will use inquire and ask the user to purchase an item and hom many
@@ -51,35 +52,38 @@ var buying = function() {
       for (var i = 0; i < results.length; i++) {
         if (results[i].item_id.toString() === answer.item_id) {
           chosenItem = results[i];
-          console.log(chosenItem.stock)
-          console.log(chosenItem.stock - answer.total)
+          console.log(chosenItem.stock_quantity)
+          console.log(chosenItem.stock_quantity - answer.total)
           console.log(chosenItem.item_id)
         }
       }
 
       // determine if there is enough supply
-      if (chosenItem.stock > parseInt(answer.total)) {
+      if (chosenItem.stock_quantity > parseInt(answer.total)) {
         // enough supply high enough, so update db, let the user know, and start over
-        connection.query("UPDATE products SET ? WHERE ?", [{
-
-          stock: chosenItem.stock - answer.total
-        }, {
-          item_id: chosenItem.item_id
-        }], function(err, res) {
-          
-          console.log("thank you for your purchase!");
-          
+        connection.query("UPDATE products SET ? WHERE ?",
+        [
+          {
+            stock_quantity: chosenItem.stock_quantity - answer.total
+          },
+          {
+            item_id: chosenItem.item_id
+          }
+        ]
+      , function(err, res) {
+        if (err) throw err;
+        console.log("Thank you for your purchase :)")
+        buying();
         });
       }
       else {
         // not enough supply
         console.log("Not enough inventory. Try again...");
-        
+      buying();
       }
     });
   });
-connection.end();   
+   
 };
 
 
-s

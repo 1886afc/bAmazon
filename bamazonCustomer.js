@@ -54,6 +54,7 @@ var buying = function() {
       for (var i = 0; i < results.length; i++) {
         if (results[i].item_id.toString() === answer.item_id) {
           chosenItem = results[i];
+          //for testing console logging 
           console.log(chosenItem.stock_quantity)
           console.log(chosenItem.stock_quantity - answer.total)
           console.log(chosenItem.item_id)
@@ -80,7 +81,7 @@ var buying = function() {
         });
       }
       else {
-        // not enough supply
+        // not enough supply run the function again
         console.log("Not enough inventory. Try again...");
         console.log("------------------------------------")
       start();
